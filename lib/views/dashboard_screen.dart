@@ -9,6 +9,9 @@ import 'study_rooms_screen.dart';
 import 'notes_screen.dart';
 import 'progress_screen.dart';
 import 'events_screen.dart';
+import 'applications_screen.dart';
+import 'noticeboard_screen.dart';
+import 'settings_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -158,7 +161,13 @@ child: selectedIndex == 0
    : selectedIndex == 3
     ? const ProgressScreen()
     : selectedIndex == 4
-        ? const EventsScreen()
+    ? const EventsScreen()
+    : selectedIndex == 5
+    ? const ApplicationsScreen()
+   : selectedIndex == 6
+    ? const NoticeboardScreen()
+    : selectedIndex == 7
+        ? const SettingsScreen()
         : SimplePage(
             title: navigationItems[selectedIndex]['title'],
             icon: navigationItems[selectedIndex]['icon'],
