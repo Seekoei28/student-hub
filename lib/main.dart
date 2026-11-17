@@ -2,9 +2,16 @@
 import 'package:flutter/material.dart';
 import 'constants/app_colors.dart';
 import 'views/dashboard_screen.dart';
+import 'package:provider/provider.dart';
+import 'viewmodels/student_viewmodel.dart';
 
 void main() {
-  runApp(const StudentHubApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => StudentViewModel(),
+      child: const StudentHubApp(),
+    ),
+  );
 }
 
 class StudentHubApp extends StatelessWidget {

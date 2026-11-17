@@ -1,6 +1,10 @@
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import '../constants/app_colors.dart';
+import '../viewmodels/student_viewmodel.dart';
+import 'edit_profile_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -28,83 +32,109 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 25),
 
           // PROFILE CARD
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(22),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  AppColors.gradientStart,
-                  AppColors.gradientEnd,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 65,
-                  height: 65,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 38,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Student Name',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 19,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        'student@example.com',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        'Student Account',
-                        style: TextStyle(
-                          color: AppColors.lightPurple,
-                          fontSize: 12,
-                        ),
-                      ),
+          Consumer<StudentViewModel>(
+            builder: (context, studentViewModel, child) {
+              final student = studentViewModel.student;
+
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      AppColors.gradientStart,
+                      AppColors.gradientEnd,
                     ],
                   ),
+                  borderRadius: BorderRadius.circular(18),
                 ),
-                const Icon(
-                  Icons.edit_outlined,
-                  color: Colors.white,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 65,
+                      height: 65,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.person,
+                        color: Colors.white,
+                        size: 38,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            student?.fullName ?? 'No student profile',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            student?.email ??
+                                'Student email not available',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            student?.studentNumber ??
+                                'Student number not available',
+                            style: const TextStyle(
+                              color: AppColors.lightPurple,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                             EditProfileScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.edit_outlined,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           ),
 
           const SizedBox(height: 30),
 
-          // ACCOUNT SETTINGS
+          // ACCOUNT
           _sectionTitle('Account'),
 
           _SettingsTile(
             icon: Icons.person_outline,
             title: 'Personal Information',
             subtitle: 'Manage your student profile',
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditProfileScreen(),
+                ),
+              );
+            },
           ),
 
           _SettingsTile(
@@ -142,7 +172,7 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 25),
 
-          // SECURITY
+          // PRIVACY AND SECURITY
           _sectionTitle('Privacy & Security'),
 
           _SettingsTile(
@@ -161,7 +191,7 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 30),
 
-          // LOGOUT BUTTON
+          // LOGOUT
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
@@ -217,7 +247,6 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-// SETTINGS TILE
 class _SettingsTile extends StatelessWidget {
   final IconData icon;
   final String title;
