@@ -4,13 +4,25 @@ import 'constants/app_colors.dart';
 import 'views/dashboard_screen.dart';
 import 'package:provider/provider.dart';
 import 'viewmodels/student_viewmodel.dart';
+import 'viewmodels/note_viewmodel.dart';
+import 'viewmodels/study_room_viewmodel.dart';
 
 void main() {
   runApp(
+    MultiProvider(
+  providers: [
     ChangeNotifierProvider(
       create: (context) => StudentViewModel(),
-      child: const StudentHubApp(),
     ),
+    ChangeNotifierProvider(
+      create: (context) => NoteViewModel(),
+    ),
+    ChangeNotifierProvider(
+      create: (context) => StudyRoomViewModel(),
+    ),
+  ],
+  child: const StudentHubApp(),
+),
   );
 }
 
