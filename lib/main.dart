@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'viewmodels/student_viewmodel.dart';
 import 'viewmodels/note_viewmodel.dart';
 import 'viewmodels/study_room_viewmodel.dart';
+import 'viewmodels/event_viewmodel.dart';
 
 void main() {
   runApp(
@@ -20,6 +21,9 @@ void main() {
     ChangeNotifierProvider(
       create: (context) => StudyRoomViewModel(),
     ),
+    ChangeNotifierProvider(
+  create: (context) => EventViewModel(),
+),
   ],
   child: const StudentHubApp(),
 ),
