@@ -10,7 +10,8 @@ class NoticeboardScreen extends StatefulWidget {
   const NoticeboardScreen({super.key});
 
   @override
-  State<NoticeboardScreen> createState() => _NoticeboardScreenState();
+  State<NoticeboardScreen> createState() =>
+      _NoticeboardScreenState();
 }
 
 class _NoticeboardScreenState extends State<NoticeboardScreen> {
@@ -23,7 +24,7 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
     super.dispose();
   }
 
-  void _showAddNoticeDialog() {
+  void _showAddNoticeDialog(BuildContext context) {
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
 
@@ -38,7 +39,7 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
             return AlertDialog(
               backgroundColor: AppColors.card,
               title: const Text(
-                'Create Announcement',
+                'Create New Notice',
                 style: TextStyle(color: Colors.white),
               ),
               content: SingleChildScrollView(
@@ -48,14 +49,15 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
                     TextField(
                       controller: titleController,
                       style: const TextStyle(color: Colors.white),
-                      decoration: _inputDecoration('Announcement title'),
+                      decoration: _inputDecoration('Notice title'),
                     ),
                     const SizedBox(height: 15),
                     TextField(
                       controller: descriptionController,
                       maxLines: 4,
                       style: const TextStyle(color: Colors.white),
-                      decoration: _inputDecoration('Description'),
+                      decoration:
+                          _inputDecoration('Notice description'),
                     ),
                     const SizedBox(height: 15),
                     DropdownButtonFormField<String>(
@@ -63,16 +65,20 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
                       dropdownColor: AppColors.card,
                       style: const TextStyle(color: Colors.white),
                       decoration: _inputDecoration('Category'),
-                      items: [
-                        'Academic',
-                        'Examinations',
-                        'General',
-                      ].map((category) {
-                        return DropdownMenuItem(
-                          value: category,
-                          child: Text(category),
-                        );
-                      }).toList(),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'Academic',
+                          child: Text('Academic'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Examinations',
+                          child: Text('Examinations'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'General',
+                          child: Text('General'),
+                        ),
+                      ],
                       onChanged: (value) {
                         if (value != null) {
                           setDialogState(() {
@@ -83,20 +89,24 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
                     ),
                     const SizedBox(height: 15),
                     DropdownButtonFormField<String>(
-                     initialValue: selectedPriority,
+                      initialValue: selectedPriority,
                       dropdownColor: AppColors.card,
                       style: const TextStyle(color: Colors.white),
                       decoration: _inputDecoration('Priority'),
-                      items: [
-                        'Important',
-                        'Reminder',
-                        'General',
-                      ].map((priority) {
-                        return DropdownMenuItem(
-                          value: priority,
-                          child: Text(priority),
-                        );
-                      }).toList(),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'Important',
+                          child: Text('Important'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Reminder',
+                          child: Text('Reminder'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'General',
+                          child: Text('General'),
+                        ),
+                      ],
                       onChanged: (value) {
                         if (value != null) {
                           setDialogState(() {
@@ -110,42 +120,53 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(dialogContext),
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
                   child: const Text(
                     'Cancel',
                     style: TextStyle(color: Colors.white60),
                   ),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                  ),
                   onPressed: () {
                     if (titleController.text.trim().isEmpty ||
                         descriptionController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Please complete all fields.',
+                          ),
+                        ),
+                      );
                       return;
                     }
 
-                    context.read<NoticeViewModel>().addNotice(
-                          title: titleController.text.trim(),
-                          description:
-                              descriptionController.text.trim(),
-                          category: selectedCategory,
-                          priority: selectedPriority,
-                        );
+                    Provider.of<NoticeViewModel>(
+                      context,
+                      listen: false,
+                    ).addNotice(
+                      title: titleController.text.trim(),
+                      description:
+                          descriptionController.text.trim(),
+                      category: selectedCategory,
+                      priority: selectedPriority,
+                    );
 
                     Navigator.pop(dialogContext);
 
-                    ScaffoldMessenger.of(this.context).showSnackBar(
+                    ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Announcement added successfully!'),
+                        content: Text('Notice added successfully!'),
+                        backgroundColor: Colors.green,
                       ),
                     );
                   },
-                  child: const Text(
-                    'Publish',
-                    style: TextStyle(color: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
                   ),
+                  child: const Text('Add Notice'),
                 ),
               ],
             );
@@ -162,13 +183,11 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
     return InputDecoration(
       labelText: label,
       labelStyle: const TextStyle(color: Colors.white60),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.white24),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.primary),
+      filled: true,
+      fillColor: AppColors.background,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
       ),
     );
   }
@@ -176,12 +195,15 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<NoticeViewModel>(
-      builder: (context, viewModel, child) {
+      builder: (context, noticeViewModel, child) {
+        final notices = noticeViewModel.filteredNotices;
+
         return SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // PAGE HEADER
               Row(
                 children: [
                   const Expanded(
@@ -194,22 +216,26 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
                       ),
                     ),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: _showAddNoticeDialog,
-                    icon: const Icon(Icons.add, size: 18),
-                    label: const Text('Add Notice'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
+                  IconButton(
+                    onPressed: () =>
+                        _showAddNoticeDialog(context),
+                    icon: const Icon(
+                      Icons.add_circle,
+                      color: AppColors.primary,
+                      size: 32,
                     ),
+                    tooltip: 'Add Notice',
                   ),
                 ],
               ),
+
               const SizedBox(height: 8),
+
               const Text(
-                'Stay informed with the latest student announcements.',
+                'Stay updated with the latest campus announcements.',
                 style: TextStyle(color: Colors.white60),
               ),
+
               const SizedBox(height: 25),
 
               // FEATURED ANNOUNCEMENT
@@ -217,48 +243,65 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(22),
                 decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
                   gradient: const LinearGradient(
                     colors: [
                       AppColors.gradientStart,
                       AppColors.gradientEnd,
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(18),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
-                      Icons.campaign,
-                      color: Colors.white,
-                      size: 38,
+                    const Row(
+                      children: [
+                        Icon(
+                          Icons.campaign,
+                          color: AppColors.lightPurple,
+                          size: 27,
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          'CAMPUS ANNOUNCEMENTS',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 18),
                     const Text(
-                      'Important Announcements',
+                      'Stay Informed!',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 21,
+                        fontSize: 23,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'Check regularly for important updates, '
-                      'academic information and student notices.',
-                      style: TextStyle(color: Colors.white70),
+                      'Check the noticeboard regularly so you never '
+                      'miss important academic updates, examination '
+                      'information and campus announcements.',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 18),
                     Row(
                       children: [
                         const Icon(
-                          Icons.notifications_active,
+                          Icons.mark_email_unread_outlined,
                           color: Colors.white,
-                          size: 18,
+                          size: 20,
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          '${viewModel.unreadCount} unread notices',
+                          '${noticeViewModel.unreadCount} unread notices',
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -270,64 +313,17 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
                 ),
               ),
 
-              const SizedBox(height: 30),
-
-              // NOTICE CATEGORIES
-              const Text(
-                'Notice Categories',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 15),
-
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  _CategoryChip(
-                    title: 'All Notices',
-                    icon: Icons.dashboard,
-                    selected:
-                        viewModel.selectedCategory == 'All Notices',
-                    onTap: () => viewModel.setCategory('All Notices'),
-                  ),
-                  _CategoryChip(
-                    title: 'Academic',
-                    icon: Icons.school,
-                    selected:
-                        viewModel.selectedCategory == 'Academic',
-                    onTap: () => viewModel.setCategory('Academic'),
-                  ),
-                  _CategoryChip(
-                    title: 'Examinations',
-                    icon: Icons.edit_document,
-                    selected:
-                        viewModel.selectedCategory == 'Examinations',
-                    onTap: () => viewModel.setCategory('Examinations'),
-                  ),
-                  _CategoryChip(
-                    title: 'General',
-                    icon: Icons.info_outline,
-                    selected:
-                        viewModel.selectedCategory == 'General',
-                    onTap: () => viewModel.setCategory('General'),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 30),
+              const SizedBox(height: 28),
 
               // SEARCH
               TextField(
                 controller: _searchController,
-                onChanged: viewModel.searchNotices,
+                onChanged: noticeViewModel.searchNotices,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'Search announcements...',
-                  hintStyle: const TextStyle(color: Colors.white54),
+                  hintText: 'Search notices...',
+                  hintStyle:
+                      const TextStyle(color: Colors.white54),
                   prefixIcon: const Icon(
                     Icons.search,
                     color: AppColors.lightPurple,
@@ -336,31 +332,70 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
                       ? IconButton(
                           onPressed: () {
                             _searchController.clear();
-                            viewModel.searchNotices('');
+                            noticeViewModel.searchNotices('');
                           },
                           icon: const Icon(
-                            Icons.clear,
-                            color: Colors.white54,
+                            Icons.close,
+                            color: Colors.white60,
                           ),
                         )
                       : null,
                   filled: true,
                   fillColor: AppColors.card,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
                   ),
                 ),
               ),
 
+              const SizedBox(height: 22),
+
+              // CATEGORY FILTERS
+              const Text(
+                'Categories',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    'All Notices',
+                    'Academic',
+                    'Examinations',
+                    'General',
+                  ].map((category) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: _CategoryChip(
+                        title: category,
+                        selected:
+                            noticeViewModel.selectedCategory ==
+                                category,
+                        onTap: () {
+                          noticeViewModel.setCategory(category);
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+
               const SizedBox(height: 25),
 
-              // LATEST NOTICES
+              // NOTICE LIST HEADER
               Row(
                 children: [
                   const Expanded(
                     child: Text(
-                      'Latest Announcements',
+                      'Latest Notices',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -369,57 +404,69 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
                     ),
                   ),
                   Text(
-                    '${viewModel.filteredNotices.length} notices',
+                    '${notices.length} notices',
                     style: const TextStyle(
-                      color: AppColors.lightPurple,
+                      color: Colors.white54,
                       fontSize: 12,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 15),
 
-              if (viewModel.filteredNotices.isEmpty)
+              const SizedBox(height: 16),
+
+              // NOTICE LIST
+              if (notices.isEmpty)
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
                     color: AppColors.card,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(15),
                   ),
                   child: const Column(
                     children: [
                       Icon(
                         Icons.notifications_off_outlined,
                         color: AppColors.lightPurple,
-                        size: 40,
+                        size: 45,
                       ),
                       SizedBox(height: 12),
                       Text(
-                        'No announcements found',
+                        'No notices found',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
                       ),
                       SizedBox(height: 6),
                       Text(
                         'Try another search or category.',
-                        style: TextStyle(color: Colors.white60),
+                        style: TextStyle(
+                          color: Colors.white54,
+                          fontSize: 13,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ],
                   ),
                 )
               else
-                ...viewModel.filteredNotices.map(
+                ...notices.map(
                   (notice) => _NoticeCard(
                     notice: notice,
                     onToggleRead: () {
-                      viewModel.toggleReadStatus(notice.id);
+                      noticeViewModel.toggleReadStatus(notice.id);
                     },
                     onDelete: () {
-                      viewModel.deleteNotice(notice.id);
+                      noticeViewModel.deleteNotice(notice.id);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Notice deleted.'),
+                        ),
+                      );
                     },
                   ),
                 ),
@@ -434,13 +481,11 @@ class _NoticeboardScreenState extends State<NoticeboardScreen> {
 // CATEGORY CHIP
 class _CategoryChip extends StatelessWidget {
   final String title;
-  final IconData icon;
   final bool selected;
   final VoidCallback onTap;
 
   const _CategoryChip({
     required this.title,
-    required this.icon,
     required this.selected,
     required this.onTap,
   });
@@ -449,40 +494,31 @@ class _CategoryChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(25),
+      borderRadius: BorderRadius.circular(20),
       child: Container(
         padding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 11,
+          horizontal: 18,
+          vertical: 10,
         ),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.primary.withValues(alpha: 0.25)
+              ? AppColors.primary
               : AppColors.card,
-          borderRadius: BorderRadius.circular(25),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: selected
                 ? AppColors.primary
-                : AppColors.primary.withValues(alpha: 0.3),
+                : AppColors.primary.withValues(alpha: 0.25),
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: AppColors.lightPurple,
-              size: 17,
-            ),
-            const SizedBox(width: 7),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-              ),
-            ),
-          ],
+        child: Text(
+          title,
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight:
+                selected ? FontWeight.bold : FontWeight.normal,
+            fontSize: 12,
+          ),
         ),
       ),
     );
@@ -513,37 +549,24 @@ class _NoticeCard extends StatelessWidget {
   }
 
   String get formattedDate {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-
-    final day = notice.date.day.toString().padLeft(2, '0');
-    final month = months[notice.date.month - 1];
-    return '$day $month ${notice.date.year}';
+    final date = notice.date;
+    return '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/'
+        '${date.year}';
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.2),
+          color: notice.isRead
+              ? AppColors.primary.withValues(alpha: 0.12)
+              : AppColors.primary.withValues(alpha: 0.45),
         ),
       ),
       child: Column(
@@ -551,56 +574,70 @@ class _NoticeCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(
-                child: Text(
-                  notice.category.toUpperCase(),
-                  style: const TextStyle(
-                    color: AppColors.lightPurple,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: priorityColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(20),
+                  color: priorityColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   notice.priority,
                   style: TextStyle(
                     color: priorityColor,
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
+              const SizedBox(width: 8),
+              Text(
+                notice.category,
+                style: const TextStyle(
+                  color: AppColors.lightPurple,
+                  fontSize: 11,
+                ),
+              ),
+              const Spacer(),
+              if (!notice.isRead)
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                ),
             ],
           ),
-          const SizedBox(height: 13),
+
+          const SizedBox(height: 14),
+
           Text(
             notice.title,
             style: TextStyle(
               color: Colors.white,
               fontSize: 16,
               fontWeight:
-                  notice.isRead ? FontWeight.normal : FontWeight.bold,
+                  notice.isRead ? FontWeight.w500 : FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 9),
+
+          const SizedBox(height: 8),
+
           Text(
             notice.description,
             style: const TextStyle(
-              color: Colors.white60,
+              color: Colors.white70,
               fontSize: 13,
               height: 1.5,
             ),
           ),
+
           const SizedBox(height: 15),
+
           Row(
             children: [
               const Icon(
@@ -608,30 +645,25 @@ class _NoticeCard extends StatelessWidget {
                 color: Colors.white54,
                 size: 14,
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  formattedDate,
-                  style: const TextStyle(
-                    color: Colors.white54,
-                    fontSize: 11,
-                  ),
+              const SizedBox(width: 6),
+              Text(
+                formattedDate,
+                style: const TextStyle(
+                  color: Colors.white54,
+                  fontSize: 11,
                 ),
               ),
-              TextButton.icon(
+              const Spacer(),
+              IconButton(
                 onPressed: onToggleRead,
+                tooltip: notice.isRead
+                    ? 'Mark as unread'
+                    : 'Mark as read',
                 icon: Icon(
                   notice.isRead
                       ? Icons.mark_email_unread_outlined
                       : Icons.mark_email_read_outlined,
-                  size: 16,
-                ),
-                label: Text(
-                  notice.isRead ? 'Unread' : 'Read',
-                  style: const TextStyle(fontSize: 11),
-                ),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.lightPurple,
+                  color: AppColors.lightPurple,
                 ),
               ),
               IconButton(
@@ -640,7 +672,6 @@ class _NoticeCard extends StatelessWidget {
                 icon: const Icon(
                   Icons.delete_outline,
                   color: Colors.redAccent,
-                  size: 19,
                 ),
               ),
             ],

@@ -8,7 +8,7 @@ import 'viewmodels/note_viewmodel.dart';
 import 'viewmodels/study_room_viewmodel.dart';
 import 'viewmodels/event_viewmodel.dart';
 import 'viewmodels/notice_viewmodel.dart';
-
+import 'viewmodels/application_viewmodel.dart';
 void main() {
   runApp(
     MultiProvider(
@@ -28,9 +28,13 @@ void main() {
 ChangeNotifierProvider(
   create: (context) => NoticeViewModel(),
 ),
+    ChangeNotifierProvider(
+      create: (context) => ApplicationViewModel(),
+    ),
   ],
   child: const StudentHubApp(),
 ),
+
   );
 }
 

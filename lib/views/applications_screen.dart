@@ -1,12 +1,21 @@
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import '../constants/app_colors.dart';
+import '../viewmodels/application_viewmodel.dart';
 
 class ApplicationsScreen extends StatelessWidget {
   const ApplicationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final applicationViewModel =
+        Provider.of<ApplicationViewModel>(context);
+
+    final opportunities = applicationViewModel.opportunities;
+    final applications = applicationViewModel.applications;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -31,20 +40,26 @@ class ApplicationsScreen extends StatelessWidget {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: const [
+            children: [
               _SummaryCard(
                 title: 'Total',
-                value: '04',
+                value: applicationViewModel.totalApplications
+                    .toString()
+                    .padLeft(2, '0'),
                 icon: Icons.assignment,
               ),
               _SummaryCard(
                 title: 'Pending',
-                value: '02',
+                value: applicationViewModel.pendingApplications
+                    .toString()
+                    .padLeft(2, '0'),
                 icon: Icons.hourglass_top,
               ),
               _SummaryCard(
                 title: 'Approved',
-                value: '01',
+                value: applicationViewModel.approvedApplications
+                    .toString()
+                    .padLeft(2, '0'),
                 icon: Icons.check_circle,
               ),
             ],
@@ -63,28 +78,38 @@ class ApplicationsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 15),
 
-          _OpportunityCard(
-            title: 'Flutter Development Assistant',
-            module: 'Technical Programming III',
-            level: 'Third Year',
-            icon: Icons.phone_android,
-          ),
-          _OpportunityCard(
-            title: 'Database Assistant',
-            module: 'Database Management',
-            level: 'Second Year',
-            icon: Icons.storage,
-          ),
-          _OpportunityCard(
-            title: 'Networking Assistant',
-            module: 'Communication Networks',
-            level: 'Third Year',
-            icon: Icons.wifi,
-          ),
+          ...opportunities.map((opportunity) {
+            final hasApplied =
+                applicationViewModel.hasApplied(opportunity.id);
+
+            return _OpportunityCard(
+              title: opportunity.title,
+              module: opportunity.module,
+              level: opportunity.academicLevel,
+              icon: _getOpportunityIcon(opportunity.moduleCode),
+              hasApplied: hasApplied,
+              onApply: () {
+                final success = applicationViewModel
+                    .applyForOpportunity(opportunity.id);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? 'Application submitted successfully!'
+                          : 'You have already applied for this opportunity.',
+                    ),
+                    backgroundColor:
+                        success ? Colors.green : Colors.orange,
+                  ),
+                );
+              },
+            );
+          }),
 
           const SizedBox(height: 30),
 
-          // MY APPLICATIONS
+          // RECENT APPLICATIONS
           const Text(
             'Recent Applications',
             style: TextStyle(
@@ -95,24 +120,67 @@ class ApplicationsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 15),
 
-          const _ApplicationCard(
-            title: 'Flutter Development Assistant',
-            module: 'TPG316C',
-            status: 'Pending',
-          ),
-          const _ApplicationCard(
-            title: 'Database Assistant',
-            module: 'DBM316C',
-            status: 'Approved',
-          ),
-          const _ApplicationCard(
-            title: 'Networking Assistant',
-            module: 'CMN316C',
-            status: 'Rejected',
-          ),
+          if (applications.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(25),
+              decoration: BoxDecoration(
+                color: AppColors.card,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Column(
+                children: [
+                  Icon(
+                    Icons.assignment_outlined,
+                    color: AppColors.lightPurple,
+                    size: 40,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'No applications yet',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    'Apply for an available opportunity to see it here.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white60,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            ...applications.map((application) {
+              return _ApplicationCard(
+                title: application.title,
+                module: application.moduleCode,
+                status: application.status,
+              );
+            }),
         ],
       ),
     );
+  }
+
+  // SELECT ICON BASED ON MODULE
+  IconData _getOpportunityIcon(String moduleCode) {
+    switch (moduleCode) {
+      case 'TPG316C':
+        return Icons.phone_android;
+      case 'DBM316C':
+        return Icons.storage;
+      case 'CMN316C':
+        return Icons.wifi;
+      default:
+        return Icons.school;
+    }
   }
 }
 
@@ -140,7 +208,11 @@ class _SummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: AppColors.lightPurple, size: 25),
+          Icon(
+            icon,
+            color: AppColors.lightPurple,
+            size: 25,
+          ),
           const SizedBox(height: 12),
           Text(
             value,
@@ -170,12 +242,16 @@ class _OpportunityCard extends StatelessWidget {
   final String module;
   final String level;
   final IconData icon;
+  final bool hasApplied;
+  final VoidCallback onApply;
 
   const _OpportunityCard({
     required this.title,
     required this.module,
     required this.level,
     required this.icon,
+    required this.hasApplied,
+    required this.onApply,
   });
 
   @override
@@ -195,7 +271,11 @@ class _OpportunityCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: AppColors.lightPurple, size: 28),
+              Icon(
+                icon,
+                color: AppColors.lightPurple,
+                size: 28,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -212,7 +292,10 @@ class _OpportunityCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             module,
-            style: const TextStyle(color: Colors.white70, fontSize: 13),
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+            ),
           ),
           const SizedBox(height: 6),
           Text(
@@ -226,12 +309,18 @@ class _OpportunityCard extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: hasApplied ? null : onApply,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
+                disabledBackgroundColor: Colors.green.withValues(
+                  alpha: 0.3,
+                ),
+                disabledForegroundColor: Colors.white,
               ),
-              child: const Text('Apply Now'),
+              child: Text(
+                hasApplied ? 'Applied' : 'Apply Now',
+              ),
             ),
           ),
         ],
