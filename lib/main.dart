@@ -1,8 +1,10 @@
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'constants/app_colors.dart';
 import 'views/dashboard_screen.dart';
-import 'package:provider/provider.dart';
+
 import 'viewmodels/student_viewmodel.dart';
 import 'viewmodels/note_viewmodel.dart';
 import 'viewmodels/study_room_viewmodel.dart';
@@ -10,35 +12,23 @@ import 'viewmodels/event_viewmodel.dart';
 import 'viewmodels/notice_viewmodel.dart';
 import 'viewmodels/application_viewmodel.dart';
 import 'viewmodels/progress_viewmodel.dart';
+import 'viewmodels/goal_viewmodel.dart';
+
 void main() {
   runApp(
     MultiProvider(
-  providers: [
-    ChangeNotifierProvider(
-      create: (context) => StudentViewModel(),
+      providers: [
+        ChangeNotifierProvider(create: (_) => StudentViewModel()),
+        ChangeNotifierProvider(create: (_) => NoteViewModel()),
+        ChangeNotifierProvider(create: (_) => StudyRoomViewModel()),
+        ChangeNotifierProvider(create: (_) => EventViewModel()),
+        ChangeNotifierProvider(create: (_) => NoticeViewModel()),
+        ChangeNotifierProvider(create: (_) => ApplicationViewModel()),
+        ChangeNotifierProvider(create: (_) => ProgressViewModel()),
+        ChangeNotifierProvider(create: (_) => GoalViewModel()),
+      ],
+      child: const StudentHubApp(),
     ),
-    ChangeNotifierProvider(
-      create: (context) => NoteViewModel(),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => StudyRoomViewModel(),
-    ),
-    ChangeNotifierProvider(
-  create: (context) => EventViewModel(),
-),
-ChangeNotifierProvider(
-  create: (context) => NoticeViewModel(),
-),
-    ChangeNotifierProvider(
-      create: (context) => ApplicationViewModel(),
-    ),
-    ChangeNotifierProvider(
-  create: (context) => ProgressViewModel(),
-),
-  ],
-  child: const StudentHubApp(),
-),
-
   );
 }
 

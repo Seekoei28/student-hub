@@ -8,6 +8,7 @@ import '../widgets/feature_card.dart';
 import 'study_rooms_screen.dart';
 import 'notes_screen.dart';
 import 'progress_screen.dart';
+import 'goals_screen.dart';
 import 'events_screen.dart';
 import 'applications_screen.dart';
 import 'noticeboard_screen.dart';
@@ -156,23 +157,26 @@ child: selectedIndex == 0
     ? const DashboardContent()
     : selectedIndex == 1
         ? const StudyRoomsScreen()
-       : selectedIndex == 2
-    ? const NotesScreen()
-   : selectedIndex == 3
-    ? const ProgressScreen()
-    : selectedIndex == 4
-    ? const EventsScreen()
-    : selectedIndex == 5
-    ? const ApplicationsScreen()
-   : selectedIndex == 6
-    ? const NoticeboardScreen()
-    : selectedIndex == 7
-        ? const SettingsScreen()
-        : SimplePage(
-            title: navigationItems[selectedIndex]['title'],
-            icon: navigationItems[selectedIndex]['icon'],
-          ),
-
+        : selectedIndex == 2
+            ? const NotesScreen()
+            : selectedIndex == 3
+                ? const ProgressScreen()
+                : selectedIndex == 4
+                    ? const GoalsScreen()
+                    : selectedIndex == 5
+                        ? const EventsScreen()
+                        : selectedIndex == 6
+                            ? const ApplicationsScreen()
+                            : selectedIndex == 7
+                                ? const NoticeboardScreen()
+                                : selectedIndex == 8
+                                    ? const SettingsScreen()
+                                    : SimplePage(
+                                        title: navigationItems[selectedIndex]
+                                            ['title'],
+                                        icon: navigationItems[selectedIndex]
+                                            ['icon'],
+                                      ),
 
                         ),
                       ),

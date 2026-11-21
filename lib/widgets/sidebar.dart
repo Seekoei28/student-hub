@@ -8,6 +8,7 @@ const List<Map<String, dynamic>> navigationItems = [
   {'title': 'Study Rooms', 'icon': Icons.groups},
   {'title': 'My Notes', 'icon': Icons.description},
   {'title': 'Progress', 'icon': Icons.trending_up},
+  {'title': 'Goals', 'icon': Icons.flag},
   {'title': 'Events', 'icon': Icons.event},
   {'title': 'Applications', 'icon': Icons.assignment},
   {'title': 'Noticeboard', 'icon': Icons.campaign},
@@ -40,11 +41,13 @@ class SidebarItem extends StatelessWidget {
         title,
         style: TextStyle(
           color: selected ? Colors.white : Colors.grey,
-          fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+          fontWeight:
+              selected ? FontWeight.bold : FontWeight.normal,
         ),
       ),
       selected: selected,
-      selectedTileColor: AppColors.primary.withValues(alpha: 0.15),
+      selectedTileColor:
+          AppColors.primary.withValues(alpha: 0.15),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
